@@ -10,73 +10,43 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { RefreshCw } from "lucide-react";
 
-const physicsConcepts = [
-  {
-    title: "Newton's First Law of Motion",
-    description:
-      "An object at rest stays at rest, and an object in motion stays in motion with the same speed and direction, unless acted upon by an external force.",
-    formula: "∑F = 0 ⟹ a = 0",
-    field: "Classical Mechanics",
-    additionalInfo:
-      "Also known as the law of inertia, this fundamental principle forms the foundation of classical mechanics and was first formulated by Sir Isaac Newton in his work Philosophiæ Naturalis Principia Mathematica in 1687.",
-  },
-  {
-    title: "Bernoulli's Principle",
-    description:
-      "In fluid dynamics, an increase in the speed of a fluid occurs simultaneously with a decrease in pressure or a decrease in the fluid's potential energy.",
-    formula: "P₁ + ½ρv₁² + ρgh₁ = P₂ + ½ρv₂² + ρgh₂",
-    field: "Fluid Dynamics",
-    additionalInfo:
-      "Named after Swiss mathematician Daniel Bernoulli, this principle explains many practical phenomena such as how airplane wings generate lift and how carburetors work in engines.",
-  },
-  {
-    title: "Einstein's Mass-Energy Equivalence",
-    description:
-      "Energy and mass are interchangeable; energy equals mass multiplied by the speed of light squared.",
-    formula: "E = mc²",
-    field: "Relativity",
-    additionalInfo:
-      "This equation, published by Albert Einstein in 1905, revolutionized physics by showing that mass and energy are different forms of the same thing. It's the theoretical basis for nuclear energy production.",
-  },
-  {
-    title: "Schrödinger's Equation",
-    description:
-      "A fundamental equation in quantum mechanics that describes how the quantum state of a physical system changes over time.",
-    formula: "iℏ ∂Ψ/∂t = ĤΨ",
-    field: "Quantum Mechanics",
-    additionalInfo:
-      "Developed by Erwin Schrödinger in 1925, this equation is to quantum mechanics what Newton's laws are to classical mechanics - a fundamental mathematical description of behavior.",
-  },
-  {
-    title: "Ohm's Law",
-    description:
-      "The current through a conductor between two points is directly proportional to the voltage across the two points.",
-    formula: "V = IR",
-    field: "Electromagnetism",
-    additionalInfo:
-      "Named after German physicist Georg Ohm, this relationship is fundamental to circuit design and electrical engineering. It states that voltage equals current multiplied by resistance.",
-  },
-];
+type PhysicsConcept = {
+  title: string;
+  description: string;
+  formula: string;
+  field: string;
+  additionalInfo: string;
+};
 
 export function PhysicsCard() {
-  const [concept, setConcept] = useState(physicsConcepts[0]);
-  const [loading, setLoading] = useState(false);
-
-  const getRandomConcept = () => {
-    setLoading(true);
-    setTimeout(() => {
-      const randomIndex = Math.floor(Math.random() * physicsConcepts.length);
-      setConcept(physicsConcepts[randomIndex]);
-      setLoading(false);
-    }, 500);
-  };
+  const [concept, setConcept] = useState<PhysicsConcept | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getRandomConcept();
+    const fetchConcept = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch("/api/ai");
+        const data = await response.json();
+        setConcept(data as PhysicsConcept);
+      } catch (error) {
+        console.error("Failed to fetch concept:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchConcept();
   }, []);
+
+  if (loading || !concept) {
+    return (
+      <Card className="w-full max-w-3xl shadow-lg p-6 text-center">
+        <p className="text-slate-500">Loading physics concept...</p>
+      </Card>
+    );
+  }
 
   return (
     <Card className="w-full max-w-3xl shadow-lg">
@@ -121,16 +91,7 @@ export function PhysicsCard() {
         </div>
       </CardContent>
       <CardFooter className="flex justify-center border-t pt-6">
-        <Button
-          onClick={getRandomConcept}
-          disabled={loading}
-          className="bg-blue-600 hover:bg-blue-700"
-        >
-          <RefreshCw
-            className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`}
-          />
-          Show Another Concept
-        </Button>
+        {/* Footer kept for spacing/design consistency; can be removed if unnecessary */}
       </CardFooter>
     </Card>
   );
