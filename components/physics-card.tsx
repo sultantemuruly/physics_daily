@@ -69,20 +69,14 @@ export function PhysicsCard() {
           </h3>
           <p className="text-slate-700">{concept.description}</p>
         </div>
-
-        <div>
-          <h3 className="text-sm font-medium text-slate-500 mb-2">Formula</h3>
-          <div className="bg-slate-100 p-4 rounded-md text-center font-mono text-lg">
-            {concept.formula}
+        {concept.formula === "NONE" ? null : (
+          <div>
+            <h3 className="text-sm font-medium text-slate-500 mb-2">Formula</h3>
+            <div className="bg-slate-100 p-4 rounded-md text-center font-mono text-lg">
+              {concept.formula}
+            </div>
           </div>
-        </div>
-
-        <div>
-          <h3 className="text-sm font-medium text-slate-500 mb-2">
-            Additional Information
-          </h3>
-          <p className="text-slate-700">{concept.additionalInfo}</p>
-        </div>
+        )}
       </CardContent>
       <CardFooter className="flex justify-center border-t pt-6">
         {/* Footer kept for spacing/design consistency; can be removed if unnecessary */}
