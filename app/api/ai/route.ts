@@ -1,15 +1,9 @@
-import { OpenAI } from "openai";
+import { ChatOpenAI } from "@langchain/openai";
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 
-type PhysicsConcept = {
-  title: string;
-  description: string;
-  formula: string;
-  field: string;
-  additionalInfo: string;
-};
+import { PhysicsConcept } from "@/types/main";
 
 export async function GET() {
   if (!process.env.OPENAI_API_KEY) {
@@ -25,32 +19,31 @@ export async function GET() {
 
   try {
     const initialPromptPath = path.join(process.cwd(), "prompt.txt");
-
     const systemPrompt = fs.readFileSync(initialPromptPath, "utf8");
 
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
+    const model = new ChatOpenAI({
+      modelName: "gpt-3.5-turbo",
+      temperature: 0.8,
+      openAIApiKey: process.env.OPENAI_API_KEY,
     });
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are a helpful assistant that generates physics content.",
-        },
-        {
-          role: "user",
-          content: systemPrompt,
-        },
-      ],
-    });
+    const response = await model.invoke([
+      {
+        role: "system",
+        content: "You are a helpful assistant that generates physics content.",
+      },
+      {
+        role: "user",
+        content: systemPrompt,
+      },
+    ]);
 
-    const rawContent = completion.choices[0].message.content;
+    const rawContent =
+      typeof response.content === "string"
+        ? response.content
+        : JSON.stringify(response.content);
 
-    // 🧠 Safely parse JSON from GPT
-    let parsed: PhysicsConcept | null = null;
+    let parsed: PhysicsConcept;
 
     try {
       parsed = JSON.parse(rawContent ?? "");
@@ -67,7 +60,7 @@ export async function GET() {
 
     return NextResponse.json(parsed);
   } catch (error) {
-    console.error("OpenAI API error:", error);
+    console.error("LangChain API error:", error);
     return NextResponse.json(
       { message: "Error processing your request" },
       { status: 500 }

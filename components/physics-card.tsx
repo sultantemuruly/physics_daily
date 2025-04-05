@@ -11,13 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-type PhysicsConcept = {
-  title: string;
-  description: string;
-  formula: string;
-  field: string;
-  additionalInfo: string;
-};
+import { PhysicsConcept } from "@/types/main";
 
 export function PhysicsCard() {
   const [concept, setConcept] = useState<PhysicsConcept | null>(null);
