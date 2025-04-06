@@ -13,8 +13,22 @@ import { Badge } from "@/components/ui/badge";
 
 import { PhysicsConcept } from "@/types/main";
 
+function formatTime(seconds: number): string {
+  const h = Math.floor(seconds / 3600)
+    .toString()
+    .padStart(2, "0");
+  const m = Math.floor((seconds % 3600) / 60)
+    .toString()
+    .padStart(2, "0");
+  const s = Math.floor(seconds % 60)
+    .toString()
+    .padStart(2, "0");
+  return `${h}:${m}:${s}`;
+}
+
 export function PhysicsCard() {
   const [concept, setConcept] = useState<PhysicsConcept | null>(null);
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,7 +37,8 @@ export function PhysicsCard() {
       try {
         const response = await fetch("/api/ai");
         const data = await response.json();
-        setConcept(data as PhysicsConcept);
+        setConcept(data.concept as PhysicsConcept);
+        setTimeLeft(data.timeLeft);
       } catch (error) {
         console.error("Failed to fetch concept:", error);
       } finally {
@@ -33,6 +48,16 @@ export function PhysicsCard() {
 
     fetchConcept();
   }, []);
+
+  useEffect(() => {
+    if (timeLeft === null) return;
+
+    const interval = setInterval(() => {
+      setTimeLeft((prev) => (prev !== null && prev > 0 ? prev - 1 : 0));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [timeLeft]);
 
   if (loading || !concept) {
     return (
@@ -51,7 +76,12 @@ export function PhysicsCard() {
               {concept.title}
             </CardTitle>
             <CardDescription className="mt-2">
-              {`Today's Physics Concept`}
+              {timeLeft !== null && (
+                <p className="text-md font-medium text-slate-950 mt-1">
+                  Next concept in:{" "}
+                  <span className="font-mono">{formatTime(timeLeft)}</span>
+                </p>
+              )}
             </CardDescription>
           </div>
           <Badge
@@ -62,6 +92,7 @@ export function PhysicsCard() {
           </Badge>
         </div>
       </CardHeader>
+
       <CardContent className="space-y-6">
         <div>
           <h3 className="text-sm font-medium text-slate-500 mb-2">
@@ -69,7 +100,8 @@ export function PhysicsCard() {
           </h3>
           <p className="text-slate-700">{concept.description}</p>
         </div>
-        {concept.formula === "NONE" ? null : (
+
+        {concept.formula !== "NONE" && (
           <div>
             <h3 className="text-sm font-medium text-slate-500 mb-2">Formula</h3>
             <div className="bg-slate-100 p-4 rounded-md text-center font-mono text-lg">
@@ -78,8 +110,9 @@ export function PhysicsCard() {
           </div>
         )}
       </CardContent>
+
       <CardFooter className="flex justify-center border-t pt-6">
-        {/* Footer kept for spacing/design consistency; can be removed if unnecessary */}
+        {/* Reserved for future action buttons or share options */}
       </CardFooter>
     </Card>
   );

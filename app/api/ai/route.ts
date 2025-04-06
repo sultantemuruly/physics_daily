@@ -2,6 +2,7 @@ import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { ChatOpenAI } from "@langchain/openai";
 import { NextResponse } from "next/server";
+import redis from "@/lib/redis";
 
 import fs from "fs";
 import path from "path";
@@ -21,6 +22,17 @@ export async function GET() {
   }
 
   try {
+    const cached = await redis.get("currentConcept");
+
+    if (cached) {
+      const ttl = await redis.ttl("currentConcept");
+      return NextResponse.json({
+        concept: JSON.parse(cached),
+        timeLeft: ttl,
+        cached: true,
+      });
+    }
+
     const filePaths = [
       path.join(process.cwd(), "data", "physics-1.pdf"),
       path.join(process.cwd(), "data", "physics-2.pdf"),
@@ -100,7 +112,15 @@ ${systemPrompt}
       );
     }
 
-    return NextResponse.json(parsed);
+    await redis.set("currentConcept", JSON.stringify(parsed), {
+      EX: 43200, // 12 hours in seconds
+    });
+
+    return NextResponse.json({
+      concept: parsed,
+      timeLeft: 43200,
+      cached: false,
+    });
   } catch (error) {
     console.error("LangChain API error:", error);
     return NextResponse.json(

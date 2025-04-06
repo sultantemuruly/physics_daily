@@ -4,7 +4,7 @@ export function Header() {
   return (
     <header className="bg-white shadow-sm">
       <div className="container mx-auto px-4 py-6">
-        <div className="flex flex-col md:flex-row items-center justify-between">
+        <div className="flex flex-col gap-4 md:flex-row items-center justify-between">
           <div className="flex items-center space-x-2">
             <AtomIcon className="h-8 w-8 text-blue-600" />
             <h1 className="text-lg md:text-2xl font-semibold md:font-bold text-slate-900">
