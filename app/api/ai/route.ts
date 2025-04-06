@@ -1,4 +1,5 @@
-import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
+import { BaseDocumentLoader } from "@langchain/core/document_loaders/base";
+import { Document } from "@langchain/core/documents";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { ChatOpenAI } from "@langchain/openai";
 import { NextResponse } from "next/server";
@@ -8,6 +9,39 @@ import fs from "fs";
 import path from "path";
 
 import { PhysicsConcept } from "@/types/main";
+
+// Custom loader for text files
+class CustomTextLoader extends BaseDocumentLoader {
+  private filePaths: string[];
+
+  constructor(filePaths: string[]) {
+    super();
+    this.filePaths = filePaths;
+  }
+
+  async load(): Promise<Document[]> {
+    const documents: Document[] = [];
+
+    for (const filePath of this.filePaths) {
+      try {
+        const text = fs.readFileSync(filePath, "utf8");
+        documents.push(
+          new Document({
+            pageContent: text,
+            metadata: {
+              source: filePath,
+              filename: path.basename(filePath),
+            },
+          })
+        );
+      } catch (error) {
+        console.error(`Error loading file ${filePath}:`, error);
+      }
+    }
+
+    return documents;
+  }
+}
 
 export async function GET() {
   if (!process.env.OPENAI_API_KEY) {
@@ -20,6 +54,8 @@ export async function GET() {
       { status: 400 }
     );
   }
+
+  console.log("YO?");
 
   try {
     const cached = await redis.get("currentConcept");
@@ -34,16 +70,12 @@ export async function GET() {
     }
 
     const filePaths = [
-      path.join(process.cwd(), "data", "physics-1.pdf"),
-      path.join(process.cwd(), "data", "physics-2.pdf"),
+      path.join(process.cwd(), "data", "physics-1.txt"),
+      path.join(process.cwd(), "data", "physics-2.txt"),
     ];
 
-    const docs = [];
-    for (const filePath of filePaths) {
-      const loader = new PDFLoader(filePath);
-      const loadedDocs = await loader.load();
-      docs.push(...loadedDocs);
-    }
+    const loader = new CustomTextLoader(filePaths);
+    const docs = await loader.load();
 
     const splitter = new RecursiveCharacterTextSplitter({
       chunkSize: 500,

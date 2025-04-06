@@ -5,3 +5,8 @@ export type PhysicsConcept = {
   field: string;
   additionalInfo: string;
 };
+
+export interface ShareButtonProps {
+  title: string;
+  description: string;
+}

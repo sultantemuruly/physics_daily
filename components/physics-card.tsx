@@ -13,6 +13,8 @@ import { Badge } from "@/components/ui/badge";
 
 import { PhysicsConcept } from "@/types/main";
 
+import { ShareButton } from "./share-button";
+
 function formatTime(seconds: number): string {
   const h = Math.floor(seconds / 3600)
     .toString()
@@ -111,8 +113,11 @@ export function PhysicsCard() {
         )}
       </CardContent>
 
-      <CardFooter className="flex justify-center border-t pt-6">
-        {/* Reserved for future action buttons or share options */}
+      <CardFooter className="flex flex-col justify-center items-center gap-2 border-t pt-6">
+        <div className="font-medium text-slate-500 text-sm">
+          Share this concept on
+        </div>
+        <ShareButton title={concept.title} description={concept.description} />
       </CardFooter>
     </Card>
   );
