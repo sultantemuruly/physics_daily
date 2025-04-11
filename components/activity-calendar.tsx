@@ -51,13 +51,13 @@ const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
   }, [activityDates, startYear, endYear]);
 
   return (
-    <div className="py-5">
+    <div>
       {calendarData.map((yearData) => (
         <div key={yearData.year} className="mb-8">
           <h3 className="text-lg font-medium mb-2">{yearData.year}</h3>
           <div className="flex">
             {/* Day labels */}
-            <div className="flex flex-col justify-between pr-2 text-xs text-gray-500 h-[100px] mt-5">
+            <div className="flex flex-col justify-between pr-2 text-[13px] text-gray-500 h-[70px] mt-5">
               <span>Mon</span>
               <span>Wed</span>
               <span>Fri</span>

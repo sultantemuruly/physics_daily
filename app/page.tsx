@@ -6,10 +6,8 @@ export default function Home() {
   return (
     <div>
       <Header />
-      <div className="flex-1 container mx-auto px-4 py-48 flex items-center justify-center">
+      <div className="flex-1 flex-col container mx-auto px-4 py-48 flex items-center justify-center">
         <PhysicsCard />
-      </div>
-      <div>
         <Activity />
       </div>
     </div>

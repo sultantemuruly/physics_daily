@@ -14,7 +14,6 @@ import { Badge } from "@/components/ui/badge";
 import { PhysicsConcept } from "@/types/main";
 
 import { ShareButton } from "./share-button";
-import { Button } from "./ui/button";
 
 function formatTime(seconds: number): string {
   const h = Math.floor(seconds / 3600)
@@ -112,12 +111,6 @@ export function PhysicsCard() {
             </div>
           </div>
         )}
-
-        <div className="flex justify-center">
-          <Button variant={"outline"} className="bg-blue-600 text-white">
-            Got It!
-          </Button>
-        </div>
       </CardContent>
 
       <CardFooter className="flex flex-col justify-center items-center gap-2 border-t pt-6">

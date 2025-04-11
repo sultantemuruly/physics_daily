@@ -5,19 +5,22 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   request: Request,
-  { params }: { params: { userId: string } }
+  context: { params: { userId: string } }
 ) {
   try {
-    const userId = parseInt(params.userId);
+    // Await the params object before accessing its properties
+    const params = await context.params;
+    const { userId } = params;
 
-    if (isNaN(userId)) {
+    const parsedId = parseInt(userId);
+    if (isNaN(parsedId)) {
       return NextResponse.json({ error: "Invalid user ID" }, { status: 400 });
     }
 
     const userActivities = await db
       .select({ date: activities.date })
       .from(activities)
-      .where(eq(activities.userId, userId))
+      .where(eq(activities.userId, parsedId))
       .orderBy(activities.date);
 
     const activityDates = userActivities.map((activity) => activity.date);
@@ -34,12 +37,15 @@ export async function GET(
 
 export async function POST(
   request: Request,
-  { params }: { params: { userId: string } }
+  context: { params: { userId: string } }
 ) {
   try {
-    const userId = parseInt(params.userId);
+    // Await the params object before accessing its properties
+    const params = await context.params;
+    const { userId } = params;
 
-    if (isNaN(userId)) {
+    const parsedId = parseInt(userId);
+    if (isNaN(parsedId)) {
       return NextResponse.json({ error: "Invalid user ID" }, { status: 400 });
     }
 
@@ -48,7 +54,7 @@ export async function POST(
 
     const newActivity = await db
       .insert(activities)
-      .values({ userId, date })
+      .values({ userId: parsedId, date })
       .onConflictDoNothing()
       .returning();
 

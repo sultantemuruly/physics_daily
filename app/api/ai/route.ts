@@ -55,8 +55,6 @@ export async function GET() {
     );
   }
 
-  console.log("YO?");
-
   try {
     const cached = await redis.get("currentConcept");
 

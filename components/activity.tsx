@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import ActivityCalendar from "./activity-calendar";
+import { Button } from "./ui/button";
 
 export default function Activity() {
   const { data: session } = useSession();
@@ -10,10 +11,11 @@ export default function Activity() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log("Session:", session);
     async function fetchActivities() {
-      if (session?.user?.id && typeof session.user.id === "string") {
+      if (session?.user?.id) {
         try {
-          const res = await fetch(`/api/user/${session.user.id}/activities`);
+          const res = await fetch(`/api/users/${session.user.id}/activities`);
           if (!res.ok) throw new Error("Failed to fetch activities");
 
           const dates: string[] = await res.json();
@@ -24,6 +26,8 @@ export default function Activity() {
         } finally {
           setLoading(false);
         }
+      } else {
+        console.log("session is missing");
       }
     }
 
@@ -31,10 +35,13 @@ export default function Activity() {
   }, [session]);
 
   async function handleAddActivity() {
-    if (!session?.user?.id || typeof session.user.id !== "string") return;
+    if (!session?.user?.id) {
+      console.log("session is missing");
+      return;
+    }
 
     try {
-      const res = await fetch(`/api/user/${session.user.id}/activities`, {
+      const res = await fetch(`/api/users/${session.user.id}/activities`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({}),
@@ -71,15 +78,19 @@ export default function Activity() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-5">
-      <h1 className="text-2xl font-bold mb-4">Activity Calendar</h1>
+    <div className="max-w-4xl mx-auto py-10">
+      <div className="flex justify-end pr-20">
+        <Button
+          variant={"outline"}
+          size={"xl"}
+          className="bg-blue-600 text-white"
+          onClick={handleAddActivity}
+        >
+          Got It!
+        </Button>
+      </div>
 
-      <button
-        className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded mb-5 transition-colors"
-        onClick={handleAddActivity}
-      >
-        {`Log Today's Activity`}
-      </button>
+      <h1 className="text-2xl font-bold mb-2 mt-5">Activity Calendar</h1>
 
       <ActivityCalendar
         activityDates={activityDates}
