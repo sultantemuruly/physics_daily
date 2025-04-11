@@ -9,7 +9,7 @@ interface ActivityCalendarProps {
 
 const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
   activityDates,
-  startYear = new Date().getFullYear() - 1,
+  startYear = new Date().getFullYear(),
   endYear = new Date().getFullYear(),
 }) => {
   const calendarData = useMemo(() => {
@@ -57,7 +57,7 @@ const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
           <h3 className="text-lg font-medium mb-2">{yearData.year}</h3>
           <div className="flex">
             {/* Day labels */}
-            <div className="flex flex-col justify-between pr-2 text-[13px] text-gray-500 h-[70px] mt-5">
+            <div className="flex flex-col justify-between pr-2 text-[10px] text-gray-500 h-[64px] mt-5">
               <span>Mon</span>
               <span>Wed</span>
               <span>Fri</span>
@@ -75,14 +75,14 @@ const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
                         return (
                           <div
                             key={dayIndex}
-                            className="w-[10px] h-[10px] m-[2px]"
+                            className="w-[11px] h-[11px] m-[1px]"
                           ></div>
                         );
 
                       return (
                         <div
                           key={dayIndex}
-                          className={`w-[10px] h-[10px] m-[2px] rounded-sm ${
+                          className={`w-[11px] h-[11px] m-[1px] ${
                             dayData.hasActivity ? "bg-green-500" : "bg-gray-200"
                           }`}
                           title={

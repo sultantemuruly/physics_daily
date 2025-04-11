@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import ActivityCalendar from "./activity-calendar";
 import { Button } from "./ui/button";
+import { Loader2 } from "lucide-react";
 
 export default function Activity() {
   const { data: session } = useSession();
@@ -72,7 +73,7 @@ export default function Activity() {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        Loading...
+        <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
       </div>
     );
   }
@@ -94,7 +95,7 @@ export default function Activity() {
 
       <ActivityCalendar
         activityDates={activityDates}
-        startYear={new Date().getFullYear() - 1}
+        startYear={new Date().getFullYear()}
         endYear={new Date().getFullYear()}
       />
     </div>

@@ -143,12 +143,12 @@ ${systemPrompt}
     }
 
     await redis.set("currentConcept", JSON.stringify(parsed), {
-      EX: 43200, // 12 hours in seconds
+      EX: 86400, // 24 hours in seconds
     });
 
     return NextResponse.json({
       concept: parsed,
-      timeLeft: 43200,
+      timeLeft: 86400,
       cached: false,
     });
   } catch (error) {
