@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD COLUMN "new_concept_available" boolean DEFAULT true;
